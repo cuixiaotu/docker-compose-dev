@@ -1,0 +1,75 @@
+server {
+    listen 80;
+    server_name yb-d-backend.stnts.com;
+    # gzip config
+    gzip on;
+    gzip_min_length 1k;
+    gzip_comp_level 9;
+    gzip_types text/plain application/javascript application/x-javascript text/css application/xml text/javascript application/x-httpd-php image/jpeg image/gif image/png;
+    gzip_vary on;
+    gzip_disable "MSIE [1-6]\.";
+
+    location / {
+			add_header Cache-Control no-cache;
+			add_header Pragma no-cache;
+			add_header Expires 0;
+			# 动态页面
+			proxy_pass  https://yb-t-backend.stnts.com;
+			
+	}
+
+    location /api/ {
+        proxy_pass http://192.168.32.35:3000;
+        proxy_set_header   X-Forwarded-Proto $scheme;
+        proxy_set_header   X-Real-IP         $remote_addr;
+    }
+
+	location /doc/ {
+        proxy_pass http://192.168.32.35:3000;
+        proxy_set_header   X-Forwarded-Proto $scheme;
+        proxy_set_header   X-Real-IP         $remote_addr;
+    }
+}
+
+
+server {
+	listen 80;
+    listen 443 ssl;
+    server_name yb-t.stnts.com  yb-d.stnts.com;
+	
+    ssl_certificate      /phpstudy_pro/Extensions/Nginx1.25.2/conf/ssl/yb-t.stnts.com.pem;
+    ssl_certificate_key  /phpstudy_pro/Extensions/Nginx1.25.2/conf/ssl/yb-t.stnts.com.key;
+	
+	 # gzip config
+    gzip on;
+    gzip_min_length 1k;
+    gzip_comp_level 9;
+    gzip_types text/plain application/javascript application/x-javascript text/css application/xml text/javascript application/x-httpd-php image/jpeg image/gif image/png;
+    gzip_vary on;
+    gzip_disable "MSIE [1-6]\.";
+
+    location / {
+			add_header Cache-Control no-cache;
+			add_header Pragma no-cache;
+			add_header Expires 0;
+			# 动态页面
+			proxy_pass  https://yb-d.stnts.com;
+			proxy_set_header   X-Forwarded-Proto $scheme;
+			proxy_set_header   X-Real-IP         $remote_addr;
+			proxy_set_header   Host 			 $http_host;
+	}
+
+
+    location /api/ {
+        proxy_pass http://192.168.32.35:3000;
+        proxy_set_header   X-Forwarded-Proto $scheme;
+        proxy_set_header   X-Real-IP         $remote_addr;
+		proxy_set_header   Host 			 $http_host;
+    }
+	
+	location /short/ {
+        proxy_pass http://192.168.32.35:3000;
+        proxy_set_header   X-Forwarded-Proto $scheme;
+        proxy_set_header   X-Real-IP         $remote_addr;
+    }
+}
