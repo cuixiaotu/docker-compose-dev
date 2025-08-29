@@ -1,14 +1,19 @@
 services:
-  backend:
-    build:
-      context: backend
-      target: builder
-    secrets:
-      - db-password
-    depends_on:
-      db:
-        condition: service_healthy
-
+  go:
+    image: golang:1.21
+    container_name: go
+    working_dir: /go/src/app
+    volumes:
+      - D:\project\examples:/go/src/app #项目目录挂载
+    ports:
+      - "8000:8000"
+      - "9000:9000"
+    environment:
+      - GO111MODULE=on
+      - GOPROXY=https://goproxy.cn
+    command: tail -f /dev/null     # 容器保持运行
+    networks:
+      app-net:
   db:
     # We use a mariadb image which supports both amd64 & arm64 architecture
     #image: mariadb:10-focal
@@ -32,7 +37,8 @@ services:
       - 3306:3306
     expose:
       - 3306
-
+    networks:
+      app-net:
   proxy:
     image: nginx
     ports:
@@ -48,8 +54,8 @@ services:
       - ./proxy/vhost:/vhost:ro
       - ./proxy/ssl:/ssl:ro
       - ./logs:/var/log/nginx                 # 挂载日志目录到宿主机目录
-   # depends_on:
-   #   - backend
+    networks:
+          app-net:
 
 volumes:
   db-data:
@@ -57,3 +63,6 @@ volumes:
 secrets:
   db-password:
     file: db/password.txt
+
+networks:
+  app-net:
