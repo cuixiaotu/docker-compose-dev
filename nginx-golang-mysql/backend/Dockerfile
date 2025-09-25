@@ -41,10 +41,16 @@
 #CMD ["/usr/local/bin/backend"]
 
 
+FROM golang:1.21 AS builder
+
+RUN go install github.com/go-kratos/kratos/cmd/kratos/v2@latest \
+    && ls -l /go/bin
+
 FROM golang:1.21
 
-RUN go install github.com/go-kratos/kratos/cmd/kratos/v2@latest
 ENV PATH=$PATH:/go/bin
+
+COPY --from=builder /go/bin/kratos /usr/local/bin/kratos
 
 WORKDIR /go/src/app
 

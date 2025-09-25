@@ -56,10 +56,8 @@ services:
       - ./logs:/var/log/nginx                 # 挂载日志目录到宿主机目录
     networks:
           app-net:
-
 volumes:
   db-data:
-
 secrets:
   db-password:
     file: db/password.txt
